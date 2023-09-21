@@ -1,0 +1,28 @@
+spring:
+  application:
+    version: v1
+    name: Task Forge
+
+  datasource:
+    url: jdbc:postgresql://localhost:7665/task-forge
+    username: t_user
+    password: 1234567890
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: taskforge.no.reply@gmail.com
+    password: jwhdgculiswtkhgu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: my-secret-shhh

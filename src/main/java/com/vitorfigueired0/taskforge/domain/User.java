@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@With
 public class User implements UserDetails {
   private Long id;
   private String name;
@@ -49,6 +50,6 @@ public class User implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return this.isConfirmed;
   }
 }

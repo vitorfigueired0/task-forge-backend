@@ -3,6 +3,7 @@ package com.vitorfigueired0.taskforge.controller;
 import com.vitorfigueired0.taskforge.service.user.UserService;
 import com.vitorfigueired0.taskforge.service.user.form.RegisterForm;
 import com.vitorfigueired0.taskforge.service.user.form.UserForm;
+import com.vitorfigueired0.taskforge.service.user.form.ValidateCodeForm;
 import com.vitorfigueired0.taskforge.service.user.view.LoginView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,12 @@ public class AuthController {
   public ResponseEntity<?> register(@RequestBody RegisterForm registerForm) {
     userService.register(registerForm);
     return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @PostMapping("/validateCode")
+  public ResponseEntity<?> validateCode(@RequestBody ValidateCodeForm validateCodeForm) {
+    userService.validateCode(validateCodeForm);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/login")

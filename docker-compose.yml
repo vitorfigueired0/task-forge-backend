@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: task-forge
+    environment:
+      POSTGRES_DB: task-forge
+      POSTGRES_USER: t_user
+      POSTGRES_PASSWORD: 1234567890
+    ports:
+      - "7665:5432"

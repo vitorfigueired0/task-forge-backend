@@ -28,8 +28,7 @@ public class SecurityConfig {
       .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(HttpMethod.GET, "/version").permitAll()
-        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+        .requestMatchers(HttpMethod.POST, "/auth/*").permitAll()
         .anyRequest().authenticated()
       );
 
