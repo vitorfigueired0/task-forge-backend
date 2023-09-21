@@ -4,12 +4,12 @@ import com.vitorfigueired0.taskforge.domain.User;
 import com.vitorfigueired0.taskforge.repository.user.UserRepository;
 import com.vitorfigueired0.taskforge.service.mail.EmailService;
 import com.vitorfigueired0.taskforge.service.mail.MailDTO;
+import com.vitorfigueired0.taskforge.service.security.TokenService;
 import com.vitorfigueired0.taskforge.service.user.form.RegisterForm;
 import com.vitorfigueired0.taskforge.service.user.form.UserForm;
 import com.vitorfigueired0.taskforge.service.user.form.ValidateCodeForm;
 import com.vitorfigueired0.taskforge.service.user.mapper.UserRegisterFormMapper;
 import com.vitorfigueired0.taskforge.service.user.view.LoginView;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,20 +25,22 @@ public class UserService {
   private final UserRegisterFormMapper userRegisterFormMapper;
   private final UserRepository repository;
   private final EmailService emailService;
+  private final TokenService tokenService;
+  BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   public UserService(UserRegisterFormMapper userRegisterFormMapper,
                      UserRepository repository,
-                     EmailService emailService) {
+                     EmailService emailService,
+                     TokenService tokenService) {
     this.userRegisterFormMapper = userRegisterFormMapper;
     this.repository = repository;
     this.emailService = emailService;
+    this.tokenService = tokenService;
   }
 
   @Transactional
   public void register(RegisterForm registerForm) {
     emailExists(registerForm.getEmail());
-
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String encodedPassword = passwordEncoder.encode(registerForm.getPassword());
 
     User user = userRegisterFormMapper.map(registerForm.withPassword(encodedPassword));
@@ -56,6 +58,19 @@ public class UserService {
     }
 
     repository.enableUser(byEmail);
+  }
+
+  public LoginView login(UserForm userForm) {
+    User userByEmail = repository.findByEmail(userForm.getEmail());
+
+    if(userByEmail == null || !passwordEncoder.matches(userForm.getPassword(), userByEmail.getPassword())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "WRONG EMAIL OR PASSWORD");
+    }
+
+    String token = tokenService.createToken(userByEmail);
+    return LoginView.builder()
+      .token(token)
+      .build();
   }
 
   public UserDetails findByEmail(String email) {
@@ -84,9 +99,4 @@ public class UserService {
     repository.insertVerificationCode(user.getId(), code);
   }
 
-  public LoginView login(UserForm userForm) {
-
-
-    return null;
-  }
 }
