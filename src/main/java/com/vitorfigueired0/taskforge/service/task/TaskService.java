@@ -10,6 +10,9 @@ import com.vitorfigueired0.taskforge.service.task.view.TaskView;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TaskService {
 
@@ -31,5 +34,18 @@ public class TaskService {
     task = repository.create(task.withOwner(actualUser));
 
     return taskViewMapper.map(task);
+  }
+
+  public TaskView findTaskById(Long id) {
+    Task task = repository.findById(id);
+    return taskViewMapper.map(task);
+  }
+
+  public List<TaskView> findAllTasks() {
+    List<Task> tasks = repository.findAll();
+
+    return tasks.stream()
+      .map(taskViewMapper::map)
+      .collect(Collectors.toList());
   }
 }
