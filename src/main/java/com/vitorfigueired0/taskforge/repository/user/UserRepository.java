@@ -25,6 +25,8 @@ public class UserRepository implements Repository<User> {
 
   private final String FIND_USER_BY_EMAIL = "SELECT * FROM USERS WHERE EMAIL = ?";
 
+  private final String FIND_USER_BY_ID = "SELECT * FROM USERS WHERE ID = ?";
+
   private final String ENABLE_USER = "UPDATE USERS SET IS_CONFIRMED = TRUE WHERE EMAIL = ?";
 
   private final String INSERT_CONFIRMATION_CODE = "INSERT INTO EMAIL_CONFIRMATION_CODE (USER_ID, CODE) " +
@@ -41,7 +43,12 @@ public class UserRepository implements Repository<User> {
 
   @Override
   public User findById(Long id) {
-    return null;
+    User user = null;
+    try {
+      user = jdbcTemplate.queryForObject(FIND_USER_BY_ID, new UserRowMapper(), id);
+    } catch (EmptyResultDataAccessException ignore) {}
+
+    return user;
   }
 
   @Override

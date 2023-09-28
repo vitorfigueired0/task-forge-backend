@@ -9,7 +9,9 @@ import com.vitorfigueired0.taskforge.service.user.form.RegisterForm;
 import com.vitorfigueired0.taskforge.service.user.form.UserForm;
 import com.vitorfigueired0.taskforge.service.user.form.ValidateCodeForm;
 import com.vitorfigueired0.taskforge.service.user.mapper.UserRegisterFormMapper;
+import com.vitorfigueired0.taskforge.service.user.mapper.UserViewMapper;
 import com.vitorfigueired0.taskforge.service.user.view.LoginView;
+import com.vitorfigueired0.taskforge.service.user.view.UserView;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,16 +28,19 @@ public class UserService {
   private final UserRepository repository;
   private final EmailService emailService;
   private final TokenService tokenService;
+  private final UserViewMapper userViewMapper;
   BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   public UserService(UserRegisterFormMapper userRegisterFormMapper,
                      UserRepository repository,
                      EmailService emailService,
-                     TokenService tokenService) {
+                     TokenService tokenService,
+                     UserViewMapper userViewMapper) {
     this.userRegisterFormMapper = userRegisterFormMapper;
     this.repository = repository;
     this.emailService = emailService;
     this.tokenService = tokenService;
+    this.userViewMapper = userViewMapper;
   }
 
   @Transactional
@@ -77,6 +82,11 @@ public class UserService {
     return repository.findByEmail(email);
   }
 
+  public UserView getUserView(Long id) {
+    User user = findById(id);
+    return userViewMapper.map(user);
+  }
+
   private void emailExists(String email) {
     if (findByEmail(email) != null) {
       ResponseStatusException userAlreadyExists = new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
@@ -99,4 +109,13 @@ public class UserService {
     repository.insertVerificationCode(user.getId(), code);
   }
 
+  public User findById(Long id) {
+    User user = repository.findById(id);
+
+    if(user == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    }
+
+    return user;
+  }
 }
